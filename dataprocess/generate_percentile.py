@@ -70,3 +70,9 @@ def data_process(filename, data_type):
     return df
 
 
+if __name__ == "__main__":
+    trainfile = '../data/train.txt'
+    testBfile = '../data/testB.txt'
+
+    train_df = data_process(trainfile, data_type='train')
+    test_df = data_process(testBfile, data_type='testB')

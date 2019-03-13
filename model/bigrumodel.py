@@ -1,7 +1,6 @@
-import pandas as pd
-import numpy as np
 import math
-from keras.models import load_model
+from keras.models import load_model,save_model
+from sklearn.ensemble import RandomForestRegressor
 from tensorflow import set_random_seed
 from keras.models import Sequential
 from keras.layers import Dense,BatchNormalization
@@ -10,8 +9,11 @@ from sklearn.preprocessing import  StandardScaler
 from sklearn.metrics import mean_squared_error
 from keras.layers.pooling import GlobalAveragePooling1D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-import os
 from keras.regularizers import L1L2
+from sklearn.metrics import pairwise
+import numpy as np
+import dataprocess.data_process as dp
+import dataprocess.generate_percentile as gp
 
 np.random.seed(28)
 set_random_seed(28)
@@ -93,7 +95,59 @@ def normalization(X_train, X_test, tX):
     return X_train, X_test, tX
 
 
-def BiGRU_train(train_data, test_data, error_sort, train_mode):
+if __name__ == "__main__":
+
+    trainfile = '../data/train.txt'
+    testBfile = '../data/testB.txt'
+    train_add = dp.dataprocess(trainfile, data_type='train', windversion='old')
+    testA_add = dp.dataprocess(testBfile, data_type='testB', windversion='old')
+    train_1ave8extend = dp.dataprocess(trainfile, data_type='train', windversion='new')
+    test_1ave = dp.dataprocess(testBfile, data_type='testB', windversion='new')
+    train_df = gp.data_process(trainfile, data_type='train')
+    test_df = gp.data_process(testBfile, data_type='testB')
+
+
+
+    train = train_df.values[:, 1:-1]
+    t = train_add.values[:, 1:-1]
+    train = np.hstack((train, t))
+
+    dtest = test_df.values[:, 1:]
+    tA = testA_add.values[:, 1:]
+    dtest = np.hstack((dtest, tA))
+
+    cor_distance = pairwise.pairwise_distances(dtest, train)
+
+    resultset = set()
+    for tmp in cor_distance:
+        index = np.argsort(tmp)
+        for i in range(10):
+            resultset.add(index[i])
+
+    index = []
+    for i in resultset:
+        index.append(i)
+
+
+
+    train = train_df.values[:, 1:-1]
+    train_target = train_df.values[:, -1]
+
+    t = train_add.values[:, 1:-1]
+    train = np.hstack((train, t))
+
+    rf = RandomForestRegressor(n_estimators=100, verbose=2, n_jobs=-1)
+    rf.fit(train, train_target)
+
+    trainHat = rf.predict(train)
+    valid = np.argsort(np.abs((trainHat - train_target)))
+
+
+
+    train_data=train_df
+    test_data=test_df
+    error_sort=valid
+    train_mode='online'
 
     #basic configuration
     batch_size = 512
@@ -144,10 +198,18 @@ def BiGRU_train(train_data, test_data, error_sort, train_mode):
                                     input_shape = (15, 40),\
                                     batch_size = batch_size, epochs = epochs, drop_out = drop_out, \
                                     patience = patience)
+
+        save_model(
+            model,
+            '../data/model/checkpoint-27-163.96.hdf5',
+            overwrite=True,
+            include_optimizer=True
+        )
+
     else:
         # load the pre-trained model
         print('#load the pre-trained model:')
-        model = load_model('/home/Team4/Team4/model/checkpoint-27-163.96.hdf5')
+        model = load_model('../data/model/checkpoint-27-163.96.hdf5')
 
     #calculate root mean squared error
     trainPredict = model.predict(X_train)
@@ -163,7 +225,7 @@ def BiGRU_train(train_data, test_data, error_sort, train_mode):
     tX_predict[tX_predict < 0] = 0
     tX_predict = tX_predict + 2
 
-    return tX_predict
-    # np.savetxt("submit_BiGRU_testB.csv", tX_predict)
+    np.savetxt("submit_BiGRU_testB.csv", tX_predict)
 
+    tX_predict
 

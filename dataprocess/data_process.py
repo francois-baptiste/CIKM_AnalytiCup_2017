@@ -321,16 +321,15 @@ def dataprocess(filename, data_type,windversion):
 
     return df
 
-#the path of train set & the path of testB set
-trainfile = 'data_new/CIKM2017_train/train.txt'
-testBfile = 'data_new/CIKM2017_testB/testB.txt'
 
-#produces the train set of 'old' wind
-#dataprocess(trainfile, data_type='train',windversion='old')
-#proceces the testB set of 'old' wind
-#dataprocess(testBfile, data_type='testB',windversion='old')
+if __name__ == "__main__":
+    trainfile = '../data/train.txt'
+    testBfile = '../data/testB.txt'
 
-#produces the extended train set
-#dataprocess(trainfile, data_type='train',windversion='new')
-#produces the extended testB set
-#dataprocess(testBfile, data_type='testB',windversion='new')
+    train_add = dataprocess(trainfile, data_type='train', windversion='old')
+
+    testA_add = dataprocess(testBfile, data_type='testB', windversion='old')
+
+    train_1ave8extend = dataprocess(trainfile, data_type='train', windversion='new')
+
+    test_1ave = dataprocess(testBfile, data_type='testB', windversion='new')
