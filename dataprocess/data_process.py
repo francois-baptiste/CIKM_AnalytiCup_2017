@@ -268,16 +268,8 @@ def dataprocess(filename, data_type,windversion):
     df = pd.DataFrame(columns=header_list)
 
     with open(filename) as fr:
-
-        if data_type == 'train':
-            sample_num = 10000
-        elif data_type == 'testB':
-            sample_num = 2000
-
-        for i in range(1, sample_num + 1):
-
-            line = fr.readline().strip().split(' ')
-            id_label, con_mat = train_convolution(line, data_type)
+        for line in fr:
+            id_label, con_mat = train_convolution(line.strip().split(' '), data_type)
             pooling_mat = max_pooling(con_mat)
 
             if windversion == 'new' and data_type == 'train':

@@ -52,16 +52,8 @@ def data_process(filename, data_type):
     df = pd.DataFrame(columns=header_list)
 
     with open(filename) as fr:
-
-        if data_type == 'train':
-            sample_num = 10000
-        elif data_type == 'testB':
-            sample_num = 2000
-
-        for i in range(1,sample_num+1):
-
-            line = fr.readline().strip().split(' ')
-            id_label,con_mat = percentile(line, data_type)
+        for line in fr:
+            id_label, con_mat = percentile(line.strip().split(' '), data_type)
             simp = list(con_mat)
             temp = [id_label[0]]
             temp += simp
