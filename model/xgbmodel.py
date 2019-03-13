@@ -32,9 +32,9 @@ def xgb_train(train_df, test_df, mode, params,num_boost_round,early_stopping):
             print("validating")
 
             tranHat = gbm.predict(xgb.DMatrix(x_train))
-            trainEorror += rmsep(y_train, tranHat)
+            trainEorror += gbm.rmsep(y_train, tranHat)
             yhat = gbm.predict(xgb.DMatrix(x_valid))
-            error += rmsep(y_valid, yhat)
+            error += gbm.rmsep(y_valid, yhat)
 
         print('rmse:{:.6f}'.format(error/5.0))
 
