@@ -314,11 +314,6 @@ def dataprocess(filename, data_type,windversion):
 
 #        print(df.head())
 
-        if windversion == 'old':            
-            df.to_csv('/home/Team4/Team4/dataset/'+data_type+'_'+windversion+'_wind_4240.csv',index=False,float_format='%.3f')
-        else:
-            df.to_csv('/home/Team4/Team4/dataset/'+data_type+'_'+windversion+'_wind_1ave_8extend.csv',index=False,float_format='%.3f')
-
     return df
 
 

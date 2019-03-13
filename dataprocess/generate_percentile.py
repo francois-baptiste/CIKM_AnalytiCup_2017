@@ -64,10 +64,6 @@ def data_process(filename, data_type):
             print(temp)
             df_temp = pd.DataFrame([temp], columns=header_list)
             df = df.append(df_temp, ignore_index=True)
-
-        #        print(df.head())
-        df.to_csv('../data/' + data_type + '_percentile.csv', index=False,
-                  float_format='%.3f')
     return df
 
 
